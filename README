@@ -1,0 +1,88 @@
+#clone this project in the site-packages folder
+# https://github.com/vinodhalaharvi/hyperic.git
+
+
+# Once you are done with that, you can create sample python program to access hqapi data in your script
+
+
+##############################################################
+#Example 1:
+xml = r"""
+  <ResourceResponse>
+  <Status>Success</Status>
+  <Resource id="10000" name="hostname.domain.com.domain.com" description="Microsoft Windows 7" location="" instanceId="11836" typeId="1">
+  <ResourceConfig key="platform.log_track.enable" value="true"/>
+  <ResourceConfig key="platform.log_track.level" value="Info"/>
+  <ResourceProperty key="arch" value="x86"/>
+  <ResourceProperty key="cpuSpeed" value="2 @ 2992 MHz"/>
+  <Resource id="31162" name="hostname Win32 FileServer" description="" location="" instanceId="14831" typeId="2">
+  <Resource id="31039" name="hostname Win32 File System B:\ (local/NTFS)" description="" location="" instanceId="29002" typeId="3">
+  <ResourceConfig key="mount" value="B:\"/>
+  <ResourceConfig key="service.log_track.enable" value=""/>
+  <ResourceConfig key="service.log_track.level" value=""/>
+  <ResourceConfig key="service.log_track.include" value=""/>
+  <ResourceConfig key="service.log_track.exclude" value=""/>
+  <ResourcePrototype instanceId="10006" resourceTypeId="3" id="10019" name="FileServer Mount"/>
+  <ResourceInfo key="autoIdentifier" value="hostname Win32 File System B:\ (local/NTFS)"/>
+  </Resource>
+ <Resource id="10001" name="hostname Win32 File test123 name System C:\ (local/NTFS)" description="" location="" instanceId="34703" typeId="3">
+  <ResourceConfig key="mount" value="C:\"/>
+  <ResourceConfig key="service.log_track.enable" value="true"/>
+  <ResourceConfig key="service.log_track.level" value="Error"/>
+  <ResourceConfig key="service.log_track.include" value="true"/>
+  <ResourceConfig key="service.log_track.exclude" value=""/>
+  <ResourcePrototype instanceId="10006" resourceTypeId="3" id="10019" name="FileServer Mount"/>
+  <ResourceInfo key="autoIdentifier" value="hostname Win32 File System C:\ (local/NTFS)"/>
+  </Resource>
+  </Resource>
+  </Resource>
+  </ResourceResponse>
+  """
+from hyperic.utils import HqApiPyObject
+  
+# Get HqApiPyObject from xml
+hqapi = HqApiPyObject(xml)
+hqapi.pprint(indent=2)
+
+# Attribute access
+print
+print hqapi.ResourceResponse.Resource.Resource.Resource
+pp.pprint(hqapi)
+print
+
+#Using generator approach
+for resource in  hqapi.ResourceResponse.Resource.Resource.Resource:
+  if resource.ResourcePrototype.name == 'FileServer Mount':
+    print resource
+    print
+
+#Using list expansion
+print [resource for resource in hqapi.ResourceResponse.Resource.Resource.Resource if resource.ResourcePrototype.name == 'FileServer Mount']
+
+
+
+##############################################################
+#Example 2:
+from hyperic.utils import HqApiPyObject
+from hyperic.utils import get_using_rest
+
+# hqhost is the HQ Application server address ( usually port 7080, 7443)
+hqhost='localhost'
+platform='hostname.domainname.com'
+
+# Get HqApiPyObject from xml
+url='http://%s:7080/hqu/hqapi1/resource/get.hqu?platformName=%s&children=true&verbose=true' % (hqhost, platform)
+
+
+# For this function to work you need to set two environment variables,  hyperic_username, hyperic_password for eg.
+# hyperic_username=<<yourusername>>; export hyperic_username
+# hyperic_password=<<yourpassword>>; export hyperic_password
+xml = get_using_rest(url)
+hqapi = HqApiPyObject(xml)
+
+#Using generator approach
+for resource in  hqapi.ResourceResponse.Resource.Resource:
+    print resource
+    print
+  
+
