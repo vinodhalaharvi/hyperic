@@ -14,8 +14,6 @@ def get_using_rest(url):
   import urllib2, base64
   assert os.environ["hyperic_username"], "Error \n 'hyperic_username' environment variable not found\nPlease make sure you export 'hyperic_username' environment variable in your .bashrc"
   assert os.environ["hyperic_password"], "Error \n 'hyperic_password' environment variable not found\nPlease make sure you export 'hyperic_password' environment variable in your .bashrc"
-  assert 'hq' not in os.environ["hyperic_username"], "You cannot use hq account username and/or password to run this script\n Please use your local ldap hyperic username and ldap password\n"
-  assert 'csx' not in os.environ["hyperic_password"], "You cannot use hq account username and/or password  to run this script\n Please use your local ldap hyperic username and ldap password\n"
   username=os.environ["hyperic_username"]
   password=os.environ["hyperic_password"]
   base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
